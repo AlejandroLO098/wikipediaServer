@@ -15,12 +15,27 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  //   const sqlInsert =
-  //     "INSERT INTO info (firstname, email, phone, comments) VALUES ('Alejandro L', 'test@gmail.com', '555-500', 'This is my second comment')";
-  //   db.query(sqlInsert, (err, result) => {
-  //     res.send("hello world");
-  //   });
+app.get("/api/viewcomments", async (req, res) => {
+  res.set({
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  });
+
+  db.getConnection((err, conn) => {
+    if (err) throw err;
+
+    try {
+      const qry = `SELECT * FROM info`;
+      conn.query(qry, (err, result) => {
+        conn.release();
+        if (err) throw err;
+        res.send(JSON.stringify(result));
+      });
+    } catch (err) {
+      console.log(err);
+      res.end;
+    }
+  });
 });
 
 app.post("/api/contactinfo", (req, res) => {
@@ -35,6 +50,6 @@ app.post("/api/contactinfo", (req, res) => {
     console.log(err);
   });
 });
-app.listen(3001, () => {
+app.listen(process.env.PORT || 3001, () => {
   console.log("running on port 3001...");
 });
